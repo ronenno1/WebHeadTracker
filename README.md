@@ -106,7 +106,7 @@ uploading: uploading_task({
 
 ```
 
-### Experiment File Setup (`EBR_VIS.js` or `EBR_AUD.js`)
+### Experiment File Setup (`nod_shake_stroop.js`)
 
 **1. Initialize Minno Mesh at the beginning of the experiment**
 ```javascript
@@ -126,30 +126,36 @@ global.init_minno_mesh(global); // Loads minno_faces components
 
 **3. End of trial: collect eye blink data**
 ```javascript
-{
-    conditions: [{ type:'inputEquals', value:'end' }],
-    actions: [
-        { type:'hideStim', handle:['All'] },
-        { 
-            type:'setTrialAttr',
-            setter: function(trialData, eventData) {
-                trialData.EBR_bins      = global.get_all_bins(global, 50); // Bin size 50 ms
-                trialData.EBR           = global.get_all(global);
-                trialData.EBR_validity  = global.get_validity(global);
-                trialData.SR            = 50; // Bin size in ms
-            }
-        },
-        { type:'custom', fn: function() { global.stop_recording(global); } },
-        { type:'log' },
-        { type:'endTrial' }
-    ]
-}
+            {
+                conditions: [{type:'inputEquals', value:'feedback1'}],
+                actions: [
+                    {type:'hideStim', handle:['All']},
+				    {type:'setInput', input:{handle:'y', on: 'keypressed', key: 'Y'}},
+				    {type:'setInput', input:{handle:'n', on: 'keypressed', key: 'N'}},
+				    {type:'setInput', input:{handle:'e', on: 'keypressed', key: 'E'}},
+				    {type:'setTrialAttr',setter:function(trialData, eventData){
+                        trialData.HM           = global.get_all(global);
+                        trialData.HM_validity  = global.get_validity(global);
+                        trialData.answer        = global.get_answer(global);
+                     
+                        if (global.current.trial_id<10){
+                            global.current.trial_id++; 
+                            global.current.HM_invalidity = global.current.HM_invalidity+(1-(trialData.HM_validity>0.5));
+                        }
+                    }},
+                    {type:'custom',fn: function(){global.stop_recording(global);}},
+
+                    {type:'log'},
+
+                ]
+            },
 ```
 ### Notes
 
-- `global.get_all` → gets complete eye blink information, including timestamps.  
-- `global.get_all_bins(global, 50)` → gets binned data (here 50 ms bins).  
-- `global.get_validity` → returns the number of valid samples detected during the trial.  
+- `global.get_all` → gets complete head movements information, including timestamps.  
+- `global.get_validity` → returns the number of valid samples detected during the trial.
+- `global.get_answer` → returns the exact answer ("yes" or "no").  
+
 - Recording stops at the end of the trial and restarts in the next trial as needed.
 
 ---
