@@ -7,7 +7,7 @@ define(['timeAPI','underscore'], function(APIconstructor, _) {
     var current = API.getCurrent();
     var height = window.screen.height*0.2;
     global.init_minno_mesh(global); // This function load minno_faces components
-    global.current.EBR_invalidity   = 0;
+    global.current.HM_invalidity   = 0;
     global.current.score            = 0;
     global.current.trial_id         = 0;
     global.current.invalid          = 0;
@@ -331,13 +331,13 @@ define(['timeAPI','underscore'], function(APIconstructor, _) {
 				    {type:'setInput', input:{handle:'n', on: 'keypressed', key: 'N'}},
 				    {type:'setInput', input:{handle:'e', on: 'keypressed', key: 'E'}},
 				    {type:'setTrialAttr',setter:function(trialData, eventData){
-                        trialData.EBR           = global.get_all(global);
-                        trialData.EBR_validity  = global.get_validity(global);
+                        trialData.HM           = global.get_all(global);
+                        trialData.HM_validity  = global.get_validity(global);
                         trialData.answer        = global.get_answer(global);
                      
                         if (global.current.trial_id<10){
                             global.current.trial_id++; 
-                            global.current.EBR_invalidity = global.current.EBR_invalidity+(1-(trialData.EBR_validity>0.5));
+                            global.current.HM_invalidity = global.current.HM_invalidity+(1-(trialData.HM_validity>0.5));
                         }
                     }},
                     {type:'custom',fn: function(){global.stop_recording(global);}},
